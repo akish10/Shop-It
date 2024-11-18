@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h3>View available items</h3>
+
+    <div>
+        <input type="search" placeholder="Search products">
+
+        <button type="submit">Search</button>
+    </div>
+    <div>
+        <ul>
+            {% for item in page_obj %}
+
+            <li>
+                <img src="{{ item.image.url }}" alt="{{ item.item_name }}" width="100">
+
+                <h3>{{ item.item_name }}</h3>
+
+                <p>{{ item.description }}</p>
+
+                <p>Price: Ksh {{ item.price }}</p>
+
+                <p>Location: {{ item.location }}</p>
+
+                <p>Seller: {{ item.seller.username }}</p>
+
+                <p>Quantity available: {{ item.quantity }}</p>
+
+                <button><a href="/MakePayment/">Add to cart</a></button>
+            </li>
+
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>

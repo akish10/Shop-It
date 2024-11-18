@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div>
+        <p>Username: {{ request.user.username }}</p>
+
+        <form method="post" enctype="multipart/form-data" action="">
+            {% csrf_token %}
+
+            {{ form.as_p }}
+
+            <button type="submit" id="add" name="action">Add item</button>
+
+            <p><button type="submit" id="remove" name="action">Remove Item</button> You can only delete an item before 24 hours from time of adding ot it website</p>
+
+        </form>
+        <div>
+
+            {% if message %}
+
+            <p>{{message}}</p>
+
+            {% endif %}
+
+        </div>
+    </div>
+    <a href="/Login/">back</a>
+</body>
+</html>
