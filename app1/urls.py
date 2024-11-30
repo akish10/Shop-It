@@ -20,5 +20,9 @@ urlpatterns = [
 
     path('MakePayment/', views.MakePayment , name = 'MakePayment'),
 
+    path('Cart/', views.Cart, name = 'Cart'),
+
+    path('ViewCart/', views.ViewCart , name = 'ViewCart'),
+
 
 ]

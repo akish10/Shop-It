@@ -9,9 +9,13 @@
     <h3>View available items</h3>
 
     <div>
-        <input type="search" placeholder="Search products">
+        <form method="get" action="">
 
-        <button type="submit">Search</button>
+            <input type="search" placeholder="Search products">
+
+            <button type="submit">Search</button>
+
+        </form>
     </div>
     <div>
         <ul>
@@ -32,7 +36,9 @@
 
                 <p>Quantity available: {{ item.quantity }}</p>
 
-                <button><a href="/MakePayment/">Add to cart</a></button>
+                <button>Add to cart </button>
+
+                <!--button><a href="/MakePayment/">Add to cart</a></button-->
             </li>
 
             {% endfor %}

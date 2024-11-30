@@ -12,6 +12,8 @@ from .models import *
 
 from .forms import *
 
+from django.db.models import Q #enables querying the database.
+
 #from .serializers import *
 
 from django.contrib.auth import authenticate, login,logout
@@ -33,7 +35,9 @@ from django.core.paginator import Paginator #for controlling number of items sho
 
     serializer_class = AddItemSerializer"""
 
-def Home(request):
+@login_required
+
+def Home(request):#done 
 
     return render(request,'home.html')
 
@@ -46,7 +50,11 @@ def Login(request): #done
 
         if form.is_valid():
 
-            username = authenticate(request, username = username , password = password)
+            username = form.cleaned_data['username']
+
+            password = form.cleaned_data['password']
+
+            user = authenticate(request, username = username , password = password)
 
             if user is not None :
 
@@ -184,7 +192,7 @@ def AllItems(request): #done
     
     items = AddItem.objects.all() 
     
-    paginator = Paginator(items, 9)  
+    paginator = Paginator(items, 10)  
 
     page_number = request.GET.get('page')  
 
@@ -193,9 +201,98 @@ def AllItems(request): #done
     return render(request, 'allItems.html', {'items': items,'page_obj':page_obj})
 
 
+def mpesa(request):
 
+    return render(request,'mpesa.html')
+
+
+@login_required
+
+def Cart(request,item_id): #for storing items that user has selected.
+
+    #item = request.GET.get('item_name')
+
+    item = AddItem.objects.get(id = item_id)
+
+    cart = request.session.get('cart',[])
+
+    for cart_item in cart:
+
+        if cart_item['item_id'] == item.id:
+
+            cart_item['quantity'] += 1
+
+            request.session['cart'] = cart
+
+            return redirect('ViewCart')
+
+    cart_item = {
+        'item_id':item.id,
+
+        'item_name': item.item_name,
+
+        'price':float(item.price),
+
+        'quantity': 1, #return render(request,'cart.html')
+
+    }
+
+    cart.append(cart_item)
+
+    request.session['cart'] = cart
+
+    return redirect('ViewCart')
+
+@login_required
+
+def ViewCart(request):
+    #shows all items in the cart from Cart view.
+
+    cart = request.session.get('cart', [])
+
+    total = sum(item['price'] * item['quantity'] for item in cart)
+
+
+    return render(request,'cart.html',{'cart':cart,'total':total})
+
+@login_required
 
 def MakePayment(request):
+
+    cart  = request.session.get('cart',[])
+
+    if not cart:
+
+        messages.error(request,'No items in cart')
+
+        return redirect('AllItems')
+
+    if cart and request.method == 'POST':
+
+        for item in cart:
+
+            BoughtItem.objects.create(
+
+                buyer = request.user,
+
+                item_bought_id = item['item_id'],
+
+                quantity_bought = item['quantity'],
+
+                price_bought = item['price'],
+
+                date_bought = now(),
+            )
+
+        
+        request.session['cart'] = []
+
+        messages.success(request,'Payment successful, Thanks for shopping with us.')
+
+    return render(request,'make_payment.html')
+
+
+"""def MakePayment(request):
 
     if request.method == 'POST':
 
@@ -223,15 +320,20 @@ def MakePayment(request):
         form = TransactionsForm()
             
 
-    return render(request,'make_payment.html',{'form':form})
+    return render(request,'make_payment.html',{'form':form})"""
   
+#def Search(request): for implementing search functionality.
 
+    #query = 
+
+@login_required
 
 def Delete(request):
 
     return render(request,'allItems.html')
 
 
+@login_required
 
 def ViewTransaction(request):
 
