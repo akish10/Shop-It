@@ -71,3 +71,20 @@ class Transactions(forms.ModelForm):
         model = Transactions
 
         fields = ['item_paid','quantity_paid','buyer_paid']
+
+class PayForm(forms.ModelForm):
+
+    class Meta:
+
+        model = Pay
+
+        fields = ['phone_number','name','amount','transaction_status']
+
+
+class OrderForm(forms.ModelForm):
+
+    class Meta:
+
+        model = Order
+
+        fields = ['item', 'quantity']

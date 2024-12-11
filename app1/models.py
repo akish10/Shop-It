@@ -7,7 +7,7 @@ from django.conf import settings
 
 
 
-class AddItem(models.Model):
+class AddItem(models.Model): #items added on website
 
     seller = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='items_sold')
 
@@ -32,7 +32,7 @@ class AddItem(models.Model):
 
 
 
-class BoughtItem(models.Model):
+class BoughtItem(models.Model): #bought items
 
     buyer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='items_bought')
 
@@ -49,7 +49,7 @@ class BoughtItem(models.Model):
         return f"{self.item.item_name} bought by {self.buyer.username}"
 
 
-class UpdateItemDetails(models.Model):
+class UpdateItemDetails(models.Model): #updated by owner of goods
 
     seller_update = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='updates_made')
 
@@ -80,5 +80,56 @@ class Transactions(models.Model):
 
      def __str__(self):
 
-        return f"Transaction for {self.item_paid} by {self.buyer_paid}"
+        return f"Transaction for {self.item_paid} by {self.buyer_paid}" 
 
+
+class Order(models.Model):
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='order_items')
+
+    item = models.ForeignKey(AddItem, on_delete=models.CASCADE, related_name='order_items')
+
+    quantity = models.PositiveIntegerField(default=1)
+
+    time  = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+
+        return f"Order by {self.user.username} for {self.item.item_name}"
+
+
+
+
+class CartItem(models.Model): # store cart items
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='cart_items')
+
+    item = models.ForeignKey(AddItem, on_delete=models.CASCADE, related_name='cart_items')
+
+    quantity = models.PositiveIntegerField(default=1)
+
+    @property
+    
+    def subtotal(self):
+
+        return self.quantity * self.item.price
+
+    def __str__(self):
+
+        return f"{self.quantity} x {self.item.item_name} for {self.user.username}"
+
+
+
+class Pay(models.Model): #handling mpesa stk form
+
+    phone_number = models.IntegerField()
+
+    name = models.CharField(max_length=50)
+
+    amount = models.DecimalField(max_digits=7, decimal_places=2)
+
+    transaction_status = models.BooleanField()
+
+    time_paid = models.DateTimeField(auto_now=True)
+
+   

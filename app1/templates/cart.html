@@ -3,29 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Shopping Cart</title>
 </head>
 <body>
-    <h3>View items in cart.</h3>
+    <h3>Your Cart</h3>
 
-    <!--ul>
-        {% for item in cart %}
+    {% if cart_items %}
+    <ul>
+        {% for item in cart_items %}
         <li>
-            <h3>{{ item.item_name }}</h3>
-            <p>Price: Ksh {{ item.price }}</p>
+            <img src="{{ item.item.image.url }}" alt="{{ item.item.item_name }}" width="60">
+
+            <h4>Item name: {{ item.item.item_name }}</h4>
+
             <p>Quantity: {{ item.quantity }}</p>
-            <p>Subtotal: Ksh {{ item.price|floatformat:2 }}</p>
+
+            <p>Price: Ksh {{ item.item.price }}</p>
+
+            <p>Subtotal: Ksh {{ item.subtotal }}</p>
+
+            <form method="post" action="{% url 'remove_from_cart' item.id %}">
+
+                {% csrf_token %}
+
+                <button type="submit">Remove from cart</button>
+
+            </form>
+
         </li>
         {% endfor %}
     </ul>
-    <h3>Total: Ksh {{ total }}</h3-->
-    <div>
-        <button type="submit" id="emptyCart" name="action">Empty cart</button>
-
-        <button type="submit" id="make_payment" name="action">Make payment</button>
-
-
-    </div>
     
+    <h4>Total: Ksh {{ total }}</h4> <button type="submit"> Pay and checkout </button>
+    {% else %}
+    <p>Your cart is empty.</p>
+    {% endif %}
 </body>
 </html>

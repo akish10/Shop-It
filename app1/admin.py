@@ -13,3 +13,6 @@ admin.site.register(UpdateItemDetails)
 
 admin.site.register(Transactions)
 
+admin.site.register(Order)
+
+

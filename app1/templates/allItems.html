@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,7 +7,10 @@
     <title>Document</title>
 </head>
 <body>
+    
     <h3>View available items</h3>
+
+    <h2><a href="/Home/">Go to dashboard</a></h2>
 
     <div>
         <form method="get" action="">
@@ -36,9 +40,16 @@
 
                 <p>Quantity available: {{ item.quantity }}</p>
 
-                <button>Add to cart </button>
+                
 
-                <!--button><a href="/MakePayment/">Add to cart</a></button-->
+                <form method="get" action="{% url 'orders' %}">
+
+                    <input type="hidden" name="item_id" value="{{ item.id }}">
+
+                    <button type="submit">Make order</button>
+                </form>
+
+
             </li>
 
             {% endfor %}

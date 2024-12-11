@@ -2,6 +2,8 @@ from django.shortcuts import render,redirect
 
 from django.contrib import messages
 
+from django.http import HttpResponse
+
 from django.utils.timezone import now
 
 from datetime import timedelta
@@ -11,6 +13,10 @@ from django.shortcuts import get_object_or_404
 from .models import *
 
 from .forms import *
+
+#from .mpesa import *
+
+import requests
 
 from django.db.models import Q #enables querying the database.
 
@@ -37,10 +43,13 @@ from django.core.paginator import Paginator #for controlling number of items sho
 
 @login_required
 
-def Home(request):#done 
+def Home(request):#logic done 
 
     return render(request,'home.html')
 
+def landingPage(request): #handling landing page
+
+    return render(request,'landing.html')
 
 def Login(request): #done 
 
@@ -201,18 +210,169 @@ def AllItems(request): #done
     return render(request, 'allItems.html', {'items': items,'page_obj':page_obj})
 
 
-def mpesa(request):
 
-    return render(request,'mpesa.html')
+@login_required
+
+def orders(request):
+
+    item_id = request.GET.get('item_id')
+
+    item = get_object_or_404(AddItem, id=item_id) if item_id else None
+
+    user = request.user
+
+    form = OrderForm(initial={'item':item})
+
+    if request.method == 'POST':
+
+        form = OrderForm(request.POST)
+
+        if form.is_valid():
+
+            order_quantity = form.cleaned_data['quantity']
+            
+            if order_quantity > item.quantity:
+
+                messages.error(request, f"Not enough stock available. Only {item.quantity} left.")
+            else:
+                
+                order = form.save(commit=False)
+
+                order.user = user
+
+                order.item = item
+
+                order.save()
+
+                item.quantity -= order_quantity
+
+                item.save()
+
+                CartItem.objects.create(user=user,item=item,quantity = order_quantity)
+
+                messages.success(request, "Order placed successfully!")
+
+                return redirect('AllItems') 
+
+        form = OrderForm(initial={'item': item})
+
+    return render(request, 'orders.html', {'form': form, 'item': item})
+
+
 
 
 @login_required
 
-def Cart(request,item_id): #for storing items that user has selected.
+def added_to_cart(request): #items added to cart
+
+    cart_items = CartItem.objects.filter(user=request.user)
+
+    orders = Order.objects.filter(user=request.user)
+
+    cart_total = sum(item.subtotal for item in cart_items)
+    
+    order_total = sum(order.item.price * order.quantity for order in orders)
+
+    return render(request, 'cart.html', {
+        'cart_items': cart_items,
+        'total': cart_total,
+        'orders': orders, 
+        'order_total': order_total, 
+    })
+
+
+def remove_from_cart(request,item_id):
+
+    cart_item = get_object_or_404(CartItem, id=item_id, user=request.user)
+
+    item = cart_item.item
+
+    quantity_to_remove = cart_item.quantity
+
+    cart_item.delete()
+
+    Order.objects.filter(user=request.user, item=item).filter(quantity=quantity_to_remove).delete()
+
+    
+    item.quantity += quantity_to_remove
+
+    item.save()
+
+    Order.objects.filter(user=request.user, item=item).filter(quantity=quantity_to_remove).delete()
+
+    messages.success(request, f"{item.item_name} has been removed from your cart.")
+    
+
+    return redirect('added_to_cart')
+
+def checkout(request):
+
+    return render(request,'pay.html')
+    
+    
+    
+
+"""@login_required
+
+def add_to_cart(request):
+
+    if request.method == 'POST':
+
+        item_id = request.POST.get('item_id')
+
+        item = AddItem.objects.get(id=item_id)
+
+        
+        cart_item, created = CartItem.objects.get_or_create(
+            user=request.user, item=item
+        )
+        
+        if not created:
+            
+            cart_item.quantity += 1
+
+            cart_item.save()
+
+        return redirect('added_to_cart')
+
+"""
+
+
+def checkout(request):
+
+    return render(request,'cart.html')
+
+
+def Logout(request):
+
+    logout(request)
+
+    return redirect('Login')
+
+#def mpesa(request):
+
+    #return render(request,'mpesa.html')
+
+
+#@login_required
+
+"""def Cart(request,item_id): #for storing items that user has selected.
 
     #item = request.GET.get('item_name')
 
-    item = AddItem.objects.get(id = item_id)
+    item = AddItem.objects.get(id=item_id)
+
+    cart_item, created = CartItem.objects.get_or_create(user=request.user, item=item)
+
+    if not created:
+
+        cart_item.quantity += 1
+
+        cart_item.save()
+
+    return redirect('ViewCart')
+
+    '''item = AddItem.objects.get(id = item_id)
 
     cart = request.session.get('cart',[])
 
@@ -241,21 +401,56 @@ def Cart(request,item_id): #for storing items that user has selected.
 
     request.session['cart'] = cart
 
+    return redirect('ViewCart')'''
+
+def RemoveFromCart(request, item_id):
+
+    cart = request.session.get('cart', [])
+
+    cart = [item for item in cart if item['item_id'] != item_id]  # Remove the specific item
+
+    request.session['cart'] = cart  # Save updated cart back to the session
+
     return redirect('ViewCart')
 
-@login_required
+
+#@login_required
 
 def ViewCart(request):
     #shows all items in the cart from Cart view.
 
-    cart = request.session.get('cart', [])
+    #cart = request.session.get('cart', [])
 
-    total = sum(item['price'] * item['quantity'] for item in cart)
+    #total = sum(item['price'] * item['quantity'] for item in cart)
 
+    cart_items = CartItem.objects.filter(user=request.user)
+
+    total = sum([item.subtotal() for item in cart_items]) 
 
     return render(request,'cart.html',{'cart':cart,'total':total})
 
-@login_required
+def checkout(request): #confirm payment before deleting item from database
+
+    cart_items = CartItem.objects.filter(user=request.user)
+
+    total = sum([item.subtotal() for item in cart_items])
+
+    if request.method == 'POST':
+        for cart_item in cart_items:
+            # Create a transaction for each cart item
+            Transaction.objects.create(
+                cart_item=cart_item,
+                quantity_paid=cart_item.quantity,
+                buyer=request.user
+            )
+            # After payment, you can choose to delete the cart items
+            cart_item.delete()
+
+        return redirect('payment_success')
+        
+    return render(request, 'checkout.html', {'cart_items': cart_items, 'total': total})
+
+#@login_required
 
 def MakePayment(request):
 
@@ -292,7 +487,61 @@ def MakePayment(request):
     return render(request,'make_payment.html')
 
 
-"""def MakePayment(request):
+def pay(request):
+
+    if request.method == "POST":
+
+        
+        form = PayForm(request.POST)
+
+        if form.is_valid():
+
+            form.save()
+
+            return redirect('Home')
+    
+    else:
+
+        form = PayForm()
+
+    return render(request,'pay.html',{'form':form})
+
+
+def stkPush(request):
+
+    if request.method == 'POST':
+
+        phone = request.POST.get('phone_number')
+
+        name = request.POST.get('name')
+
+        amount = request.POST.get('amount')
+
+        access_token =AccessToken.access_token
+
+        apiUrl = 'https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest'
+
+        header = {'Authorization':'Bearer %s'% access_token}
+
+        request = {    
+   "BusinessShortCode":Password.shortcode,
+   "Password":Password.decoded_password,
+   "Timestamp":Password.timestamp,   
+   "TransactionType": "CustomerPayBillOnline",    
+   "Amount": amount,    
+   "PartyA":pnone,    
+   "PartyB":Password.shortcode,    
+   "PhoneNumber":phone,    
+   "CallBackURL": "https://sandbox.safaricom.co.ke/mpesa",    
+   "AccountReference":"Winnie",    
+   "TransactionDesc":"Makepayment."
+}
+
+    
+    response = requests.post(apiUrl,json=request,header=header)
+    return HttpResponse('success')
+
+def MakePayment(request):
 
     if request.method == 'POST':
 
@@ -320,7 +569,7 @@ def MakePayment(request):
         form = TransactionsForm()
             
 
-    return render(request,'make_payment.html',{'form':form})"""
+    return render(request,'make_payment.html',{'form':form})
   
 #def Search(request): for implementing search functionality.
 
@@ -337,11 +586,6 @@ def Delete(request):
 
 def ViewTransaction(request):
 
-    return render(request,'transactions.html')
+    return render(request,'transactions.html')"""
 
 
-def Logout(request):
-
-    logout(request)
-
-    return redirect('Login')
