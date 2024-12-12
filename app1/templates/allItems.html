@@ -4,13 +4,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <link rel="stylesheet" href="{% static 'allitems.css'%}">
+    <title>Items in the market</title>
 </head>
 <body>
     
     <h3>View available items</h3>
 
-    <h2><a href="/Home/">Go to dashboard</a></h2>
+    <button><a href="/Home/">Go to dashboard</a></button>
+
+    <button><a href="/added_to_cart/">Check cart</a></button>
 
     <div>
         <form method="get" action="">
@@ -21,11 +24,12 @@
 
         </form>
     </div>
-    <div>
+    <div id="items-container">
         <ul>
             {% for item in page_obj %}
 
-            <li>
+            <li class="item">
+                
                 <img src="{{ item.image.url }}" alt="{{ item.item_name }}" width="100">
 
                 <h3>{{ item.item_name }}</h3>
@@ -46,7 +50,7 @@
 
                     <input type="hidden" name="item_id" value="{{ item.id }}">
 
-                    <button type="submit">Make order</button>
+                    <button type="submit" id="make-order">Make order</button>
                 </form>
 
 

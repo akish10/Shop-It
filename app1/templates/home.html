@@ -4,46 +4,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <link rel="stylesheet" href="{% static 'home.css' %}">
+    <title>User Dashboard</title>
+  
 </head>
 <body>
-    <h2>Hello guys</h2>
-
-  {% if request.user.is_authenticated %}
-
-  <p>{{ request.user.username }}</p>
-  <a href="/Logout/">Logout</a>
-
-  <h1>Welcome!</h1>
-
-  <div>
-    <button><a href="/AllItems/">View items in the market</a></button>
-
-    <button><a href="/added_to_cart/">View cart</a></button>
-  </div>
-
-  <div id="user-activity-div">
-
-    <div id="div-transactions">
-
-      <h3>View your transactions</h3>
     
-    </div>
 
-    <div id="div-history">
-      <h3> Check you payment history</h3>
-    </div>
+    {% if request.user.is_authenticated %}
 
-  </div>
+        <p id="user-name"> Hello  {{ request.user.username }}</p>
+        <button><a href="/Logout/">Logout</a></button>
+        <h1 id="user-welcome">Welcome!</h1>
+        
+        
 
-{% else %}
-  <a href="/Login/">Login</a>
-  <a href="/Signup/">Signup</a>
-{% endif %}
+        <div>
+            <button><a href="/AllItems/">View items in the market</a></button>
+            <button><a href="/added_to_cart/">View cart</a></button>
+        </div>
 
-<footer>
-  <h4>Call us: 0797744565765</h4> <h3>For compaints reach out to us through shopit@gmail.com</h3>
-  <p>&copy; Shop It since 2024.</p>
-</footer>
+        <div id="user-activity-div">
+            <div id="div-transactions">
+              <a href="">Transactions</a>
+              <h3>Your transactions</h3>
+            </div>
+            <div id="div-history">
+
+              <a href="">Check your payment history</a>
+              <h3>Payment history</h3>
+              
+            </div>
+        </div>
+    {% else %}
+        <div>
+            <a href="/Login/">Login</a>
+            <a href="/Signup/">Signup</a>
+        </div>
+    {% endif %}
+
+    <footer>
+        <h4>Call us: 0797744565765</h4>
+        <h3>For complaints, reach out to us through shopit@gmail.com</h3>
+        <p>&copy; Shop It since 2024.</p>
+    </footer>
 </body>
 </html>

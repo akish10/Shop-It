@@ -1,0 +1,52 @@
+body{
+    background-color:azure;
+    margin: 0;
+    padding: 0;
+    
+}
+
+#items-container ul {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); 
+    gap: 20px; 
+    padding: 0;
+    list-style: none; 
+    margin: 20px;
+}
+
+#items-container .item {
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+}
+
+#items-container img {
+    margin-bottom: 10px;
+    max-width: 100%; 
+    height: auto;
+}
+
+#items-container h3 {
+    font-size: 18px;
+    margin: 10px 0;
+}
+
+#items-container p {
+    font-size: 14px;
+    margin: 5px 0;
+}
+
+#make-order {
+    background-color: #6A5BAC;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#make-order:hover {
+    background-color: #BF5139;
+}
