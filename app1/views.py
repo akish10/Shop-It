@@ -129,6 +129,8 @@ def Insert(request): #done
 
                 message = 'Item added successfully.'
 
+                return redirect('Home')
+
         elif action == 'remove':
 
             item_name = request.POST.get('item_name')

@@ -1,0 +1,76 @@
+body{
+    background-color:azure;
+    margin: 0;
+    padding: 0;
+    
+}
+
+div {
+    margin: 20px auto;
+    padding: 20px;
+    max-width: 500px;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    background-color: #f9f9f9;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+
+div p {
+    font-size: 16px;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+
+button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+button#remove {
+    background-color: #ff4d4d;
+}
+
+button#remove:hover {
+    background-color: #cc0000;
+}
+
+
+div > div p {
+    font-size: 14px;
+    color: green;
+    margin-top: 10px;
+}
+
+
+a {
+    display: inline-block;
+    margin-top: 20px;
+    text-decoration: none;
+    color: #007bff;
+    font-size: 14px;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: #0056b3;
+}
