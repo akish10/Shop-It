@@ -347,42 +347,12 @@ def MakePayment(request):
 
 
 
-"""@login_required
-
-def add_to_cart(request):
-
-    if request.method == 'POST':
-
-        item_id = request.POST.get('item_id')
-
-        item = AddItem.objects.get(id=item_id)
-
-        
-        cart_item, created = CartItem.objects.get_or_create(
-            user=request.user, item=item
-        )
-        
-        if not created:
-            
-            cart_item.quantity += 1
-
-            cart_item.save()
-
-        return redirect('added_to_cart')
-
-"""
-
-
-def checkout(request):
-
-    return render(request,'cart.html')
-
 
 def Logout(request):
 
     logout(request)
 
-    return redirect('Login')
+    return redirect('landingPage')
 
 #def mpesa(request):
 
