@@ -1,0 +1,6 @@
+python 3.10.2
+CSS3
+DJANGO
+Bootstrap version 5
+VS Code
+
