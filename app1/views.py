@@ -304,13 +304,48 @@ def remove_from_cart(request,item_id):
     
 
     return redirect('added_to_cart')
+    
+@login_required 
 
-def checkout(request):
+def MakePayment(request):
+    if request.method == 'POST':
+        form = PayForm(request.POST)
+        if form.is_valid():
+            
+            phone_number = form.cleaned_data['phone_number']
+            amount = form.cleaned_data['amount']
 
-    return render(request,'pay.html')
-    
-    
-    
+            
+            transaction_success = True  
+
+            if transaction_success:
+
+                payment = Pay.objects.create(
+                    phone_number=phone_number,
+                    name=request.user.username,  
+                    amount=amount,
+                    transaction_status=True  
+                )
+                
+                cart_items = CartItem.objects.filter(user=request.user)
+
+                for cart_item in cart_items:
+                    
+                    cart_item.delete()
+
+                messages.success(request, "Payment successful. Items have been removed from your cart.")
+                return redirect('Home')  
+            else:
+                messages.error(request, "Payment failed. Please try again.")
+        else:
+            messages.error(request, "Invalid payment form. Please correct the errors.")
+
+    else:
+        form = PayForm()
+
+    return render(request, 'pay.html', {'form': form})
+
+
 
 """@login_required
 

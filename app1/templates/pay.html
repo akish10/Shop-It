@@ -1,14 +1,91 @@
+{%load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Make payment</title>
+    <style>
+        body {
+            background-color:azure;
+            margin: 0;
+            padding: 0;
+        }
+
+        div {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        form {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            width: 400px;
+        }
+
+        form p {
+            margin-bottom: 15px;
+            font-size: 14px;
+            color: #333333;
+        }
+
+        form label {
+            display: block;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #555555;
+        }
+
+        form input[type="text"],
+        form input[type="number"],
+        form input[type="email"],
+        form select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #cccccc;
+            border-radius: 5px;
+            font-size: 14px;
+            color: #333333;
+        }
+
+        form input::placeholder {
+            color: #aaaaaa;
+        }
+
+        button[type="submit"] {
+            background-color: #007bff;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #0056b3;
+            transform: scale(1.02);
+        }
+
+        button[type="submit"]:focus {
+            outline: none;
+        }
+    </style>
+    
 </head>
 <body>
 
     <div>
-        <form method="post" action="/stkPush/">
+        <form method="post" action="">
 
             {% csrf_token %}
 
